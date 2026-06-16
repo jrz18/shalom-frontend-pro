@@ -1,437 +1,300 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="dark">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shalom Pro — Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-:root {
-  --bg: #0b0f1a; --surface: #111827; --surface2: #1e293b;
-  --border: #1e293b; --border2: #334155;
-  --text: #f1f5f9; --text2: #94a3b8; --text3: #64748b;
-  --primary: #6366f1; --primary2: #818cf8;
-  --success: #22c55e; --warning: #f59e0b; --danger: #ef4444;
-  --info: #3b82f6; --purple: #a78bfa; --teal: #14b8a6;
-  --radius: 12px;
-}
-
-body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-
-/* ===== HEADER ===== */
-.header {
-  background: linear-gradient(135deg, #111827 0%, #0b0f1a 100%);
-  padding: 16px 28px; border-bottom: 1px solid var(--border);
-  display: flex; justify-content: space-between; align-items: center;
-  position: sticky; top: 0; z-index: 50; backdrop-filter: blur(12px);
-}
-.header-left { display: flex; align-items: center; gap: 12px; }
-.logo { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
-.logo span { background: linear-gradient(135deg, #6366f1, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-.version-badge { background: var(--surface2); color: var(--text3); font-size: 10px; padding: 3px 8px; border-radius: 20px; font-weight: 600; }
-.header-right { display: flex; align-items: center; gap: 12px; }
-.live-dot { width: 7px; height: 7px; background: var(--success); border-radius: 50%; animation: pulse 2s infinite; }
-@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
-.header-time { color: var(--text3); font-size: 12px; }
-
-/* ===== BUTTONS ===== */
-.btn { border: none; border-radius: 8px; padding: 8px 16px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; font-family: inherit; }
-.btn-primary { background: linear-gradient(135deg, #6366f1, #4f46e5); color: #fff; }
-.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(99,102,241,0.4); }
-.btn-ghost { background: var(--surface2); color: var(--text2); border: 1px solid var(--border2); }
-.btn-ghost:hover { background: var(--border2); color: var(--text); }
-.btn-success { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; }
-.btn-danger { background: rgba(239,68,68,0.15); color: var(--danger); }
-
-/* ===== STATS ===== */
-.stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; padding: 20px 28px; }
-.stat-card {
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-  padding: 16px 18px; transition: all 0.25s; cursor: pointer; position: relative; overflow: hidden;
-}
-.stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
-.stat-card.total::before { background: linear-gradient(90deg, #6366f1, #a78bfa); }
-.stat-card.pending::before { background: var(--warning); }
-.stat-card.sent::before { background: var(--info); }
-.stat-card.transit::before { background: var(--purple); }
-.stat-card.delivered::before { background: var(--success); }
-.stat-card.error::before { background: var(--danger); }
-.stat-card:hover { transform: translateY(-2px); border-color: var(--border2); }
-.stat-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
-.stat-value { font-size: 28px; font-weight: 800; }
-.stat-card.total .stat-value { color: var(--primary2); }
-.stat-card.pending .stat-value { color: var(--warning); }
-.stat-card.sent .stat-value { color: var(--info); }
-.stat-card.transit .stat-value { color: var(--purple); }
-.stat-card.delivered .stat-value { color: var(--success); }
-.stat-card.error .stat-value { color: var(--danger); }
-
-/* ===== TOOLBAR ===== */
-.toolbar { padding: 0 28px 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
-.filters { display: flex; gap: 6px; flex-wrap: wrap; }
-.filter-btn { background: transparent; border: 1px solid var(--border); color: var(--text3); padding: 7px 16px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; font-family: inherit; }
-.filter-btn:hover { border-color: var(--text3); color: var(--text2); }
-.filter-btn.active { background: var(--primary); border-color: transparent; color: #fff; }
-.search-box { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; color: var(--text); font-size: 13px; width: 220px; outline: none; font-family: inherit; }
-.search-box:focus { border-color: var(--primary); }
-.search-box::placeholder { color: var(--text3); }
-
-/* ===== TABLE ===== */
-.table-wrapper { padding: 0 28px 28px; }
-table { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--surface); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
-thead th { background: #0d1117; color: var(--text3); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; padding: 12px 14px; text-align: left; font-weight: 600; }
-tbody tr { transition: background 0.15s; }
-tbody tr:hover { background: rgba(99,102,241,0.04); }
-tbody td { padding: 12px 14px; border-top: 1px solid var(--border); font-size: 13px; }
-
-/* Badges */
-.badge { padding: 3px 10px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-.badge-PENDIENTE { background: rgba(245,158,11,0.12); color: var(--warning); }
-.badge-ENVIADO { background: rgba(59,130,246,0.12); color: var(--info); }
-.badge-EN_TRANSITO { background: rgba(167,139,250,0.12); color: var(--purple); }
-.badge-ENTREGADO { background: rgba(34,197,94,0.12); color: var(--success); }
-.badge-RECOGIDO { background: rgba(20,184,166,0.12); color: var(--teal); }
-.badge-ERROR { background: rgba(239,68,68,0.12); color: var(--danger); }
-.badge-TEST { background: rgba(99,102,241,0.12); color: var(--primary2); }
-
-.tracking { font-family: 'Courier New', monospace; color: #38bdf8; font-size: 12px; }
-.client-name { color: var(--text); font-weight: 500; }
-.client-sub { color: var(--text3); font-size: 11px; }
-.monto { color: var(--success); font-weight: 700; }
-.empty { text-align: center; padding: 50px; color: var(--text3); }
-.empty-icon { font-size: 40px; margin-bottom: 12px; }
-
-/* ===== MODAL ===== */
-.modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); display: none; justify-content: center; align-items: center; z-index: 100; }
-.modal-bg.open { display: flex; }
-.modal { background: var(--surface); border: 1px solid var(--border2); border-radius: 16px; padding: 28px; width: 520px; max-width: 95vw; max-height: 85vh; overflow-y: auto; animation: modalIn 0.2s ease; }
-@keyframes modalIn { from { opacity:0; transform: scale(0.95) translateY(10px); } to { opacity:1; transform: scale(1) translateY(0); } }
-.modal h2 { font-size: 18px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
-
-/* Form */
-.form-group { margin-bottom: 14px; }
-.form-label { display: block; font-size: 12px; color: var(--text3); margin-bottom: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
-.form-input, .form-select { width: 100%; background: var(--bg); border: 1px solid var(--border2); border-radius: 8px; padding: 10px 14px; color: var(--text); font-size: 14px; outline: none; font-family: inherit; }
-.form-input:focus, .form-select:focus { border-color: var(--primary); }
-.form-select { cursor: pointer; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.form-actions { display: flex; gap: 10px; margin-top: 20px; }
-.form-actions .btn { flex: 1; padding: 12px; font-size: 14px; }
-
-/* Detail modal */
-.detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
-.detail-label { color: var(--text3); font-size: 13px; }
-.detail-value { color: var(--text); font-size: 13px; font-weight: 500; text-align: right; }
-
-/* Timeline */
-.timeline { margin-top: 16px; }
-.tl-item { display: flex; gap: 10px; padding: 6px 0; }
-.tl-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
-.tl-dot.done { background: var(--success); }
-.tl-dot.active { background: var(--info); animation: pulse 2s infinite; }
-.tl-dot.wait { background: var(--border2); }
-.tl-text { font-size: 12px; color: var(--text3); }
-.tl-text.done { color: var(--text2); }
-
-/* Toast */
-.toast { position: fixed; bottom: 24px; right: 24px; background: var(--success); color: #fff; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; z-index: 200; animation: slideUp 0.3s ease; display: none; }
-.toast.show { display: block; }
-@keyframes slideUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
-
-@media (max-width: 900px) {
-  .stats { grid-template-columns: repeat(3, 1fr); }
-  .toolbar { flex-direction: column; align-items: flex-start; }
-}
-@media (max-width: 600px) {
-  .stats { grid-template-columns: repeat(2, 1fr); }
-  .table-wrapper { overflow-x: auto; padding: 0 12px 12px; }
-  .header { padding: 12px 16px; }
-  .form-row { grid-template-columns: 1fr; }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shalom Pro Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #0b0e14; color: #e2e8f0; }
+    .glass { background: rgba(23, 27, 34, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .step-active { color: #4ade80; }
+    .step-active .dot { background-color: #4ade80; box-shadow: 0 0 10px #4ade80; }
+    .step-inactive { color: #475569; }
+    .step-inactive .dot { background-color: #334155; }
+  </style>
 </head>
-<body>
-
-<!-- HEADER -->
-<div class="header">
-  <div class="header-left">
-    <div class="logo">📦 <span>Shalom</span> Pro</div>
-    <span class="version-badge">v2.0</span>
-  </div>
-  <div class="header-right">
-    <div class="live-dot"></div>
-    <span class="header-time" id="lastUpdate">Conectando...</span>
-    <button class="btn btn-ghost" onclick="loadData()">⟳ Sync</button>
-    <button class="btn btn-primary" onclick="openNewOrder()">+ Nuevo Pedido</button>
-  </div>
-</div>
-
-<!-- STATS -->
-<div class="stats">
-  <div class="stat-card total" onclick="setFilter('TODOS')"><div class="stat-label">Total</div><div class="stat-value" id="sTotal">-</div></div>
-  <div class="stat-card pending" onclick="setFilter('PENDIENTE')"><div class="stat-label">Pendientes</div><div class="stat-value" id="sPending">-</div></div>
-  <div class="stat-card sent" onclick="setFilter('ENVIADO')"><div class="stat-label">Enviados</div><div class="stat-value" id="sSent">-</div></div>
-  <div class="stat-card transit" onclick="setFilter('EN_TRANSITO')"><div class="stat-label">En tránsito</div><div class="stat-value" id="sTransit">-</div></div>
-  <div class="stat-card delivered" onclick="setFilter('ENTREGADO')"><div class="stat-label">Entregados</div><div class="stat-value" id="sDelivered">-</div></div>
-  <div class="stat-card error" onclick="setFilter('ERROR')"><div class="stat-label">Errores</div><div class="stat-value" id="sError">-</div></div>
-</div>
-
-<!-- TOOLBAR -->
-<div class="toolbar">
-  <div class="filters" id="filterBtns">
-    <button class="filter-btn active" onclick="setFilter('TODOS')">Todos</button>
-    <button class="filter-btn" onclick="setFilter('PENDIENTE')">Pendientes</button>
-    <button class="filter-btn" onclick="setFilter('ENVIADO')">Enviados</button>
-    <button class="filter-btn" onclick="setFilter('EN_TRANSITO')">En tránsito</button>
-    <button class="filter-btn" onclick="setFilter('ENTREGADO')">Entregados</button>
-    <button class="filter-btn" onclick="setFilter('ERROR')">Errores</button>
-  </div>
-  <input class="search-box" type="text" placeholder="🔍 Buscar cliente..." id="searchInput" oninput="renderTable()">
-</div>
-
-<!-- TABLE -->
-<div class="table-wrapper">
-  <table>
-    <thead><tr>
-      <th>Estado</th><th>N° Orden</th><th>Cliente</th><th>Producto</th><th>Destino</th><th>Cobrar</th><th>Fecha</th><th></th>
-    </tr></thead>
-    <tbody id="tableBody">
-      <tr><td colspan="8" class="empty"><div class="empty-icon">📦</div>Cargando historial...</td></tr>
-    </tbody>
-  </table>
-</div>
-
-<!-- MODAL: NUEVO PEDIDO -->
-<div class="modal-bg" id="newOrderModal">
-  <div class="modal" onclick="event.stopPropagation()">
-    <h2>📋 Registrar Nuevo Pedido</h2>
-    <form id="orderForm" onsubmit="submitOrder(event)">
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Nombre del cliente *</label>
-          <input class="form-input" id="fNombre" required placeholder="Ej: Juan Pérez">
+<body class="p-4 md:p-8">
+  <div class="max-w-7xl mx-auto space-y-8">
+    
+    <!-- HEADER -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div class="flex items-center gap-3">
+        <div class="bg-blue-600 p-2 rounded-lg shadow-lg shadow-blue-500/20">
+          <span class="material-symbols-outlined text-white text-3xl">package_2</span>
         </div>
-        <div class="form-group">
-          <label class="form-label">DNI</label>
-          <input class="form-input" id="fDni" placeholder="12345678">
+        <div>
+          <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+            Shalom Pro <span class="text-xs font-normal text-blue-400 border border-blue-400/30 px-1.5 rounded">v2.0</span>
+          </h1>
+          <p class="text-gray-400 text-sm flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+            Sistema de Seguimiento Avanzado
+          </p>
         </div>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Teléfono</label>
-          <input class="form-input" id="fTelefono" placeholder="987654321">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Producto *</label>
-          <select class="form-select" id="fProducto" required></select>
-        </div>
+      <div class="flex gap-3">
+        <button onclick="syncData()" class="flex items-center gap-2 px-4 py-2 glass rounded-xl hover:bg-white/5 transition-all text-sm font-medium">
+          <span class="material-symbols-outlined text-lg">sync</span> Sincronizar
+        </button>
+        <button onclick="openNewOrder()" class="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20 text-sm font-semibold">
+          <span class="material-symbols-outlined text-lg">add</span> Nuevo Pedido
+        </button>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Cantidad</label>
-          <input class="form-input" id="fCantidad" type="number" value="1" min="1">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Precio Total (S/)</label>
-          <input class="form-input" id="fPrecio" type="number" step="0.01" placeholder="Auto">
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Agencia destino *</label>
-        <input class="form-input" id="fAgencia" required placeholder="Ej: SULLANA SANTA ROSA">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Notas (opcional)</label>
-        <input class="form-input" id="fNotas" placeholder="Indicaciones especiales...">
-      </div>
-      <div class="form-actions">
-        <button type="button" class="btn btn-ghost" onclick="closeModal('newOrderModal')">Cancelar</button>
-        <button type="submit" class="btn btn-success" id="submitBtn">✓ Registrar Pedido</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- MODAL: DETALLE -->
-<div class="modal-bg" id="detailModal" onclick="closeModal('detailModal')">
-  <div class="modal" id="detailContent" onclick="event.stopPropagation()"></div>
-</div>
-
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
-
-<script>
-// ========== CONFIG ==========
-const API_URL = 'https://shalom-backend-pro-771378637930.us-central1.run.app';
-const API_KEY = 'shalom-pro-2026-secreto';
-
-let allPedidos = [];
-let productos = [];
-let currentFilter = 'TODOS';
-
-// ========== API ==========
-async function api(path, options = {}) {
-  const res = await fetch(API_URL + path, {
-    ...options,
-    headers: { 'x-api-key': API_KEY, 'Content-Type': 'application/json', ...(options.headers || {}) }
-  });
-  return res.json();
-}
-
-// ========== LOAD DATA ==========
-async function loadData() {
-  try {
-    const [pedidosRes, prodRes] = await Promise.all([
-      api('/api/pedidos'),
-      api('/api/productos')
-    ]);
-
-    allPedidos = pedidosRes.pedidos || [];
-    productos = prodRes.productos || [];
-
-    // Stats
-    const count = (e) => allPedidos.filter(p => p.estado === e).length;
-    document.getElementById('sTotal').textContent = allPedidos.length;
-    document.getElementById('sPending').textContent = count('PENDIENTE');
-    document.getElementById('sSent').textContent = count('ENVIADO');
-    document.getElementById('sTransit').textContent = count('EN_TRANSITO');
-    document.getElementById('sDelivered').textContent = count('ENTREGADO');
-    document.getElementById('sError').textContent = count('ERROR');
-
-    // Cargar productos en el select
-    const sel = document.getElementById('fProducto');
-    sel.innerHTML = '<option value="">Seleccionar...</option>' +
-      productos.map(p => `<option value="${p.handle}">${p.nombre_corto} — S/${p.precio_unitario}</option>`).join('');
-
-    renderTable();
-    document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('es-PE');
-  } catch (e) {
-    console.error('Error cargando:', e);
-    document.getElementById('lastUpdate').textContent = '⚠️ Sin conexión';
-  }
-}
-
-// ========== RENDER TABLE ==========
-function renderTable() {
-  const search = document.getElementById('searchInput').value.toLowerCase();
-  let filtered = currentFilter === 'TODOS' ? allPedidos : allPedidos.filter(p => p.estado === currentFilter);
-  if (search) filtered = filtered.filter(p => (p.cliente_nombre || '').toLowerCase().includes(search) || (p.n_orden || '').toLowerCase().includes(search));
-
-  const tbody = document.getElementById('tableBody');
-  if (!filtered.length) {
-    tbody.innerHTML = '<tr><td colspan="8" class="empty"><div class="empty-icon">📭</div>No hay pedidos</td></tr>';
-    return;
-  }
-
-  tbody.innerHTML = filtered.map(p => {
-    const prod = p.productos;
-    return `<tr>
-      <td><span class="badge badge-${p.estado}">${p.estado}</span></td>
-      <td>${p.n_orden ? `<span class="tracking">${p.n_orden}</span>` : '<span style="color:var(--text3)">—</span>'}</td>
-      <td><div class="client-name">${p.cliente_nombre || '-'}</div><div class="client-sub">${p.cliente_dni ? 'DNI: '+p.cliente_dni : ''}</div></td>
-      <td>${prod?.nombre_corto || p.producto_handle} <span style="color:var(--text3)">x${p.cantidad}</span></td>
-      <td>${p.agencia_destino || '-'}</td>
-      <td><span class="monto">S/${p.saldo_cobrar || 0}</span></td>
-      <td style="color:var(--text3);font-size:12px">${formatDate(p.created_at)}</td>
-      <td><button class="btn btn-ghost" style="padding:4px 10px;font-size:11px" onclick="showDetail(${p.id})">👁️</button></td>
-    </tr>`;
-  }).join('');
-}
-
-// ========== FILTERS ==========
-function setFilter(f) {
-  currentFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(b => {
-    b.classList.toggle('active', b.textContent.includes(
-      f === 'TODOS' ? 'Todos' : f === 'PENDIENTE' ? 'Pendientes' : f === 'ENVIADO' ? 'Enviados' : f === 'EN_TRANSITO' ? 'tránsito' : f === 'ENTREGADO' ? 'Entregados' : 'Errores'
-    ));
-  });
-  renderTable();
-}
-
-// ========== NEW ORDER ==========
-function openNewOrder() {
-  document.getElementById('orderForm').reset();
-  document.getElementById('newOrderModal').classList.add('open');
-}
-
-async function submitOrder(e) {
-  e.preventDefault();
-  const btn = document.getElementById('submitBtn');
-  btn.disabled = true; btn.textContent = '⏳ Enviando...';
-
-  try {
-    const body = {
-      cliente_nombre: document.getElementById('fNombre').value,
-      cliente_dni: document.getElementById('fDni').value || undefined,
-      cliente_telefono: document.getElementById('fTelefono').value || undefined,
-      producto_handle: document.getElementById('fProducto').value,
-      cantidad: parseInt(document.getElementById('fCantidad').value) || 1,
-      precio_total: parseFloat(document.getElementById('fPrecio').value) || undefined,
-      agencia_destino: document.getElementById('fAgencia').value,
-      notas: document.getElementById('fNotas').value || undefined,
-    };
-
-    const result = await api('/api/pedido', { method: 'POST', body: JSON.stringify(body) });
-
-    if (result.success) {
-      showToast('✅ Pedido registrado correctamente');
-      closeModal('newOrderModal');
-      loadData();
-    } else {
-      showToast('❌ ' + (result.error || 'Error desconocido'));
-    }
-  } catch (err) {
-    showToast('❌ Error de conexión');
-  }
-  btn.disabled = false; btn.textContent = '✓ Registrar Pedido';
-}
-
-// ========== DETAIL ==========
-function showDetail(id) {
-  const p = allPedidos.find(x => x.id === id);
-  if (!p) return;
-
-  const steps = [
-    { l: 'Pedido recibido', d: true },
-    { l: 'Registrado en Shalom', d: ['ENVIADO','EN_TRANSITO','ENTREGADO','RECOGIDO'].includes(p.estado) },
-    { l: 'En tránsito', d: ['EN_TRANSITO','ENTREGADO','RECOGIDO'].includes(p.estado) },
-    { l: 'En agencia destino', d: ['ENTREGADO','RECOGIDO'].includes(p.estado) },
-    { l: 'Recogido por cliente', d: p.estado === 'RECOGIDO' },
-  ];
-  const activeIdx = steps.findLastIndex(s => s.d);
-
-  document.getElementById('detailContent').innerHTML = `
-    <h2>📦 Pedido #${p.id}</h2>
-    <div class="detail-row"><span class="detail-label">Estado</span><span class="badge badge-${p.estado}">${p.estado}</span></div>
-    <div class="detail-row"><span class="detail-label">N° Orden</span><span class="detail-value">${p.n_orden || 'Pendiente'}</span></div>
-    <div class="detail-row"><span class="detail-label">Código seguimiento</span><span class="detail-value tracking">${p.cod_seguimiento || '-'}</span></div>
-    <div class="detail-row"><span class="detail-label">Cliente</span><span class="detail-value">${p.cliente_nombre}</span></div>
-    <div class="detail-row"><span class="detail-label">DNI</span><span class="detail-value">${p.cliente_dni || '-'}</span></div>
-    <div class="detail-row"><span class="detail-label">Teléfono</span><span class="detail-value">${p.cliente_telefono || '-'}</span></div>
-    <div class="detail-row"><span class="detail-label">Producto</span><span class="detail-value">${p.productos?.nombre_corto || p.producto_handle} x${p.cantidad}</span></div>
-    <div class="detail-row"><span class="detail-label">Destino</span><span class="detail-value">${p.agencia_destino}</span></div>
-    <div class="detail-row"><span class="detail-label">Cobrar</span><span class="detail-value monto">S/${p.saldo_cobrar || 0}</span></div>
-    <div class="detail-row"><span class="detail-label">Total</span><span class="detail-value">S/${p.precio_total || 0}</span></div>
-    <div class="detail-row"><span class="detail-label">Registrado</span><span class="detail-value">${formatDate(p.created_at)}</span></div>
-    ${p.notas ? `<div class="detail-row"><span class="detail-label">Notas</span><span class="detail-value">${p.notas}</span></div>` : ''}
-    <div class="timeline"><h2 style="font-size:14px;color:var(--text3)">📍 Seguimiento</h2>
-    ${steps.map((s,i) => `<div class="tl-item"><div class="tl-dot ${s.d ? (i===activeIdx?'active':'done') : 'wait'}"></div><span class="tl-text ${s.d?'done':''}">${s.l}</span></div>`).join('')}
     </div>
-    <div class="form-actions" style="margin-top:16px"><button class="btn btn-ghost" onclick="closeModal('detailModal')" style="flex:1;padding:12px">Cerrar</button></div>
-  `;
-  document.getElementById('detailModal').classList.add('open');
-}
 
-// ========== HELPERS ==========
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-function formatDate(d) { if (!d) return '-'; const dt = new Date(d); return dt.toLocaleDateString('es-PE',{day:'2-digit',month:'short'}) + ' ' + dt.toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit'}); }
-function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
+    <!-- STATS (Clickable for filtering) -->
+    <div id="stats" class="grid grid-cols-2 md:grid-cols-6 gap-4">
+      <!-- Se llena dinamicamente -->
+    </div>
 
-// ========== INIT ==========
-loadData();
-setInterval(loadData, 30000);
-</script>
+    <!-- MAIN TABLE -->
+    <div class="glass rounded-3xl overflow-hidden shadow-2xl">
+      <div class="p-6 border-b border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div id="filter-tabs" class="flex gap-2 p-1 bg-black/20 rounded-xl">
+          <button onclick="filterTable('TODOS')" class="px-4 py-1.5 rounded-lg text-sm font-medium transition-all" id="btn-TODOS">Todos</button>
+          <button onclick="filterTable('PENDIENTE')" class="px-4 py-1.5 rounded-lg text-sm text-gray-400 hover:text-white transition-all" id="btn-PENDIENTE">Pendientes</button>
+          <button onclick="filterTable('EN_TRANSITO')" class="px-4 py-1.5 rounded-lg text-sm text-gray-400 hover:text-white transition-all" id="btn-EN_TRANSITO">En tránsito</button>
+          <button onclick="filterTable('EN_DESTINO')" class="px-4 py-1.5 rounded-lg text-sm text-gray-400 hover:text-white transition-all" id="btn-EN_DESTINO">En destino</button>
+          <button onclick="filterTable('ENTREGADO')" class="px-4 py-1.5 rounded-lg text-sm text-gray-400 hover:text-white transition-all" id="btn-ENTREGADO">Entregados</button>
+        </div>
+        <div class="relative w-full md:w-64">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-lg">search</span>
+          <input type="text" onkeyup="searchByClient(this.value)" placeholder="Buscar cliente..." class="w-full bg-black/20 border-none rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-blue-600 transition-all outline-none">
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="text-[11px] font-bold text-gray-500 uppercase tracking-wider bg-white/[0.01]">
+              <th class="px-6 py-4">Estado</th>
+              <th class="px-6 py-4">N° Orden</th>
+              <th class="px-6 py-4">Cliente</th>
+              <th class="px-6 py-4">Contenido</th>
+              <th class="px-6 py-4">Destino</th>
+              <th class="px-6 py-4">Cobrar</th>
+              <th class="px-6 py-4">Fecha</th>
+              <th class="px-6 py-4 text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody" class="divide-y divide-white/5">
+          </tbody>
+        </table>
+      </div>
+
+      <!-- PAGINACIÓN -->
+      <div id="pagination" class="p-4 border-t border-white/5 flex justify-between items-center text-sm text-gray-500">
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DETALLE -->
+  <div id="modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden">
+    <div class="glass w-full max-w-lg rounded-3xl shadow-2xl p-8 space-y-8 animate-in fade-in zoom-in duration-300">
+      <div id="modalContent"></div>
+      <button onclick="closeModal()" class="w-full py-4 bg-white/5 hover:bg-white/10 rounded-2xl font-bold transition-all border border-white/5">Cerrar</button>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'http://localhost:3000/api';
+    let allPedidos = [];
+    let currentFilter = 'TODOS';
+    let currentPage = 1;
+    let searchQuery = '';
+    const itemsPerPage = 20;
+
+    async function loadData() {
+      try {
+        const res = await fetch(`${API_URL}/pedidos`);
+        const data = await res.json();
+        allPedidos = data.pedidos || data;
+        renderStats();
+        renderTable();
+      } catch (err) { console.error(err); }
+    }
+
+    function renderStats() {
+      const stats = {
+        TOTAL: allPedidos.length,
+        PENDIENTES: allPedidos.filter(p => p.estado === 'PENDIENTE').length,
+        EN_TRANSITO: allPedidos.filter(p => p.estado === 'EN_TRANSITO').length,
+        EN_DESTINO: allPedidos.filter(p => p.estado === 'EN_DESTINO').length,
+        ENTREGADOS: allPedidos.filter(p => p.estado === 'ENTREGADO').length,
+        ERRORES: allPedidos.filter(p => p.estado === 'ERROR').length
+      };
+
+      const container = document.getElementById('stats');
+      container.innerHTML = Object.entries(stats).map(([k, v]) => `
+        <div onclick="filterTable('${k === 'TOTAL' ? 'TODOS' : k}')" class="glass p-4 rounded-2xl cursor-pointer hover:bg-white/5 transition-all">
+          <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">${k}</p>
+          <p class="text-3xl font-bold ${k === 'ERRORES' && v > 0 ? 'text-red-500' : 'text-white'}" style="${k==='ENTREGADOS'?'color:#4ade80':''}">${v}</p>
+        </div>
+      `).join('');
+    }
+
+    function getStatusColor(status) {
+      const colors = {
+        'PENDIENTE': 'bg-gray-500/20 text-gray-400',
+        'ENVIADO': 'bg-blue-500/20 text-blue-400',
+        'EN_TRANSITO': 'bg-purple-500/20 text-purple-400',
+        'EN_DESTINO': 'bg-orange-500/20 text-orange-400 border border-orange-500/50',
+        'ENTREGADO': 'bg-green-500/20 text-green-400',
+        'ERROR': 'bg-red-500/20 text-red-400'
+      };
+      return colors[status] || colors.PENDIENTE;
+    }
+
+    function renderTable() {
+      let filtered = currentFilter === 'TODOS' ? allPedidos : allPedidos.filter(p => p.estado === (currentFilter === 'EN_TRANSITO' ? 'EN_TRANSITO' : currentFilter));
+      
+      // Si hay busqueda
+      if (searchQuery) {
+        filtered = filtered.filter(p => p.cliente_nombre.toLowerCase().includes(searchQuery.toLowerCase()));
+      }
+
+      const total = filtered.length;
+      const start = (currentPage - 1) * itemsPerPage;
+      const paginated = filtered.slice(start, start + itemsPerPage);
+
+      const tableBody = document.getElementById('tableBody');
+      if (paginated.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="8" class="px-6 py-20 text-center text-gray-500 text-sm">No se encontraron pedidos con estos filtros</td></tr>`;
+        renderPagination(0);
+        return;
+      }
+
+      tableBody.innerHTML = paginated.map(p => `
+        <tr class="group hover:bg-white/[0.02] transition-all">
+          <td class="px-6 py-4">
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${getStatusColor(p.estado)}">
+              ${p.estado.replace(/_/g, ' ')}
+            </span>
+          </td>
+          <td class="px-6 py-4">
+            <p class="text-sm font-semibold text-blue-400">#${p.n_orden || p.id.substring(0,8)}</p>
+            <p class="text-[10px] text-gray-600">${p.cod_seguimiento || '-'}</p>
+          </td>
+          <td class="px-6 py-4">
+            <p class="text-sm font-medium text-white">${p.cliente_nombre}</p>
+            <p class="text-[10px] text-gray-500">DNI: ${p.cliente_dni || '-'}</p>
+          </td>
+          <td class="px-6 py-4">
+            <p class="text-sm text-gray-300 font-medium">
+                ${p.notas ? p.notas.replace(/Sincronizado: |Shalom Contenido: |Shalom: /g, '') : '1 Paquete'}
+            </p>
+          </td>
+          <td class="px-6 py-4">
+            <p class="text-sm text-gray-400">${p.agencia_destino || '-'}</p>
+          </td>
+          <td class="px-6 py-4">
+            <p class="text-sm font-bold text-green-400">S/${p.saldo_cobrar}</p>
+          </td>
+          <td class="px-6 py-4">
+            <p class="text-[11px] text-gray-500">${new Date(p.created_at).toLocaleDateString()} ${new Date(p.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+          </td>
+          <td class="px-6 py-4 text-right">
+            <button onclick="verPedido('${p.id}')" class="p-2 hover:bg-white/10 rounded-lg transition-all text-gray-500 hover:text-white">
+              <span class="material-symbols-outlined text-lg">visibility</span>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      renderPagination(total);
+      
+      // Update tabs and stats selection
+      ['TODOS', 'PENDIENTE', 'EN_TRANSITO', 'EN_DESTINO', 'ENTREGADO'].forEach(f => {
+        const btn = document.getElementById(`btn-${f}`);
+        if(!btn) return;
+        if(f === currentFilter) {
+          btn.classList.add('bg-blue-600', 'text-white');
+          btn.classList.remove('text-gray-400');
+        } else {
+          btn.classList.remove('bg-blue-600', 'text-white');
+          btn.classList.add('text-gray-400');
+        }
+      });
+    }
+
+    function renderPagination(total) {
+      const totalPages = Math.ceil(total / itemsPerPage) || 1;
+      const start = total === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+      const end = Math.min(currentPage * itemsPerPage, total);
+      
+      const container = document.getElementById('pagination');
+      container.innerHTML = `
+        <p>Mostrando ${start} a ${end} de ${total} pedidos</p>
+        <div class="flex gap-2">
+          <button onclick="changePage(${currentPage - 1})" ${currentPage <= 1 ? 'disabled' : ''} class="p-2 glass rounded-lg hover:bg-white/10 disabled:opacity-20 disabled:cursor-not-allowed">
+            <span class="material-symbols-outlined text-sm">chevron_left</span>
+          </button>
+          <p class="flex items-center px-3 text-white font-bold">${currentPage}</p>
+          <button onclick="changePage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''} class="p-2 glass rounded-lg hover:bg-white/10 disabled:opacity-20 disabled:cursor-not-allowed">
+            <span class="material-symbols-outlined text-sm">chevron_right</span>
+          </button>
+        </div>
+      `;
+    }
+
+    function changePage(p) { currentPage = p; renderTable(); }
+    function filterTable(f) { currentFilter = f; currentPage = 1; renderTable(); }
+    function searchByClient(q) { searchQuery = q; currentPage = 1; renderTable(); }
+
+    async function verPedido(id) {
+      const p = allPedidos.find(x => x.id == id);
+      if(!p) return;
+
+      const steps = [
+        { label: 'Pedido recibido', active: true },
+        { label: 'Registrado en Shalom', active: ['ENVIADO', 'EN_TRANSITO', 'EN_DESTINO', 'ENTREGADO'].includes(p.estado) },
+        { label: 'En tránsito', active: ['EN_TRANSITO', 'EN_DESTINO', 'ENTREGADO'].includes(p.estado) },
+        { label: 'En agencia destino', active: ['EN_DESTINO', 'ENTREGADO'].includes(p.estado) },
+        { label: 'Recogido por cliente', active: p.estado === 'ENTREGADO' }
+      ];
+
+      const modal = document.getElementById('modal');
+      const content = document.getElementById('modalContent');
+      
+      content.innerHTML = `
+        <div class="space-y-6">
+          <div class="flex justify-between items-center">
+            <span class="px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(p.estado)} uppercase">
+              ${p.estado.replace(/_/g, ' ')}
+            </span>
+            <p class="text-gray-500 text-sm font-medium">#${p.n_orden || p.id.substring(0,8)}</p>
+          </div>
+          
+          <div class="space-y-4 text-left">
+            <h2 class="text-2xl font-bold text-white">${p.cliente_nombre}</h2>
+            <div class="grid grid-cols-2 gap-y-4 gap-x-2 text-sm">
+              <div><p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">DNI</p><p class="text-white">${p.cliente_dni || '-'}</p></div>
+              <div><p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Destino</p><p class="text-white">${p.agencia_destino || '-'}</p></div>
+              <div><p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Cobrar</p><p class="text-green-400 font-bold">S/${p.saldo_cobrar}</p></div>
+              <div><p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Producto</p><p class="text-white">${p.notas ? p.notas.replace(/Sincronizado: |Shalom Contenido: |Shalom: /g, '') : 'Paquete'}</p></div>
+            </div>
+          </div>
+
+          <div class="pt-8 space-y-6 relative border-l-2 border-white/10 ml-4">
+            ${steps.map((s, i) => `
+              <div class="flex items-center gap-4 -ml-[9px] ${s.active ? 'step-active' : 'step-inactive'}">
+                <div class="w-4 h-4 rounded-full dot border-2 border-[#0b0e14]"></div>
+                <p class="text-sm font-semibold">${s.label}</p>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+      modal.classList.remove('hidden');
+    }
+
+    function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+    async function syncData() { await loadData(); }
+    loadData();
+  </script>
 </body>
 </html>
