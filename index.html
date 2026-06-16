@@ -161,6 +161,19 @@
       const start = (currentPage - 1) * itemsPerPage;
       const paginated = filtered.slice(start, start + itemsPerPage);
 
+      // Update tab colors (must run before early return for empty results)
+      ['TODOS', 'PENDIENTE', 'EN_TRANSITO', 'EN_DESTINO', 'ENTREGADO'].forEach(f => {
+        const btn = document.getElementById(`btn-${f}`);
+        if(!btn) return;
+        if(f === currentFilter) {
+          btn.classList.add('bg-blue-600', 'text-white');
+          btn.classList.remove('text-gray-400');
+        } else {
+          btn.classList.remove('bg-blue-600', 'text-white');
+          btn.classList.add('text-gray-400');
+        }
+      });
+
       const tableBody = document.getElementById('tableBody');
       if (paginated.length === 0) {
         tableBody.innerHTML = `<tr><td colspan="8" class="px-6 py-20 text-center text-gray-500 text-sm">No se encontraron pedidos con estos filtros</td></tr>`;
@@ -206,19 +219,6 @@
       `).join('');
 
       renderPagination(total);
-      
-      // Update tabs and stats selection
-      ['TODOS', 'PENDIENTE', 'EN_TRANSITO', 'EN_DESTINO', 'ENTREGADO'].forEach(f => {
-        const btn = document.getElementById(`btn-${f}`);
-        if(!btn) return;
-        if(f === currentFilter) {
-          btn.classList.add('bg-blue-600', 'text-white');
-          btn.classList.remove('text-gray-400');
-        } else {
-          btn.classList.remove('bg-blue-600', 'text-white');
-          btn.classList.add('text-gray-400');
-        }
-      });
     }
 
     function renderPagination(total) {
@@ -293,7 +293,32 @@
     }
 
     function closeModal() { document.getElementById('modal').classList.add('hidden'); }
-    async function syncData() { await loadData(); }
+    async function syncData() {
+      const btn = document.querySelector('button[onclick="syncData()"]');
+      const origHTML = btn.innerHTML;
+      btn.innerHTML = '<span class="material-symbols-outlined text-lg animate-spin">sync</span> Sincronizando...';
+      btn.disabled = true;
+      
+      try {
+        const res = await fetch(`${API_URL}/sync`, { method: 'POST' });
+        const data = await res.json();
+        
+        if (data.error) throw new Error(data.error);
+        
+        // Recargar datos
+        await loadData();
+        
+        const msg = data.updated > 0 
+          ? `${data.updated} pedido(s) actualizados de ${data.total} verificados`
+          : `${data.total} pedidos verificados. Sin cambios.`;
+        alert(msg);
+      } catch (err) {
+        alert('Error al sincronizar: ' + err.message);
+      } finally {
+        btn.innerHTML = origHTML;
+        btn.disabled = false;
+      }
+    }
     loadData();
   </script>
 </body>
