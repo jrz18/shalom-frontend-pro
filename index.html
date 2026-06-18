@@ -163,7 +163,10 @@
   </style>
 
   <script>
-    const API_URL = 'http://localhost:3000/api';
+    // Si abres el dashboard en localhost -> usa el backend local; si no (Vercel) -> usa el de la nube
+    const API_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+      ? 'http://localhost:3000/api'
+      : 'https://shalom-bot-771378637930.us-central1.run.app/api';
     let allPedidos = [];
     let currentFilter = 'TODOS';
     let currentPage = 1;
@@ -482,7 +485,7 @@
 
         closeNewOrder();
         await loadData();
-        alert('Pedido registrado correctamente');
+        alert(data.message || 'Pedido registrado correctamente');
       } catch (err) {
         alert('Error: ' + err.message);
       } finally {
