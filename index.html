@@ -123,6 +123,10 @@
           <datalist id="agenciasDatalist"></datalist>
           <input type="hidden" id="no_agencia_id">
           <p id="destinoHint" class="text-[10px] text-gray-500">Elige la agencia exacta de la lista de Shalom.</p>
+          <select id="no_origen" class="w-full bg-[#161b22] text-white border border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-600 outline-none">
+            <option value="CANTO GRANDE">📍 Origen: Canto Grande</option>
+            <option value="AV. PRINCIPAL">📍 Origen: Av. Principal</option>
+          </select>
         </div>
         <div class="space-y-3">
           <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Producto y cobro</p>
@@ -136,10 +140,10 @@
             </div>
             <div>
               <label class="text-[10px] text-gray-500 block mb-1">Anticipo</label>
-              <input type="number" id="no_anticipo" step="0.01" value="0" oninput="calcSaldo(); validateForm()" class="w-full bg-[#161b22] text-white border border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-600 outline-none">
+              <input type="number" id="no_anticipo" step="0.01" value="10" oninput="calcSaldo(); validateForm()" class="w-full bg-[#161b22] text-white border border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-600 outline-none">
             </div>
             <div>
-              <label class="text-[10px] text-green-400 block mb-1 font-bold">A cobrar</label>
+              <label class="text-[10px] text-green-400 block mb-1 font-bold">Restante</label>
               <input type="number" id="no_saldo" step="0.01" readonly class="w-full bg-green-500/10 border border-green-500/30 rounded-xl px-4 py-3 text-sm text-green-400 font-bold outline-none">
             </div>
           </div>
@@ -340,9 +344,13 @@
             <h2 class="text-2xl font-bold text-white">${p.cliente_nombre}</h2>
             <div class="grid grid-cols-2 gap-y-4 gap-x-2 text-sm">
               <div><p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">DNI</p><p class="text-white">${p.cliente_dni || '-'}</p></div>
-              <div><p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Destino</p><p class="text-white">${p.agencia_destino || '-'}</p></div>
-              <div><p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Cobrar</p><p class="text-green-400 font-bold">S/${p.saldo_cobrar}</p></div>
-              <div><p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Producto</p><p class="text-white">${p.notas ? p.notas.replace(/Sincronizado: |Shalom Contenido: |Shalom: /g, '') : 'Paquete'}</p></div>
+              <div><p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Color</p><p class="text-white">${p.color || 'Único'}</p></div>
+              <div class="col-span-2"><p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Destino</p><p class="text-white">${p.agencia_destino || '-'}</p></div>
+              <div><p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Precio</p><p class="text-white">S/${p.precio_total ?? '-'}</p></div>
+              <div><p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Anticipo</p><p class="text-white">S/${p.anticipo ?? 0}</p></div>
+              <div><p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Envío Shalom</p><p class="text-orange-400">S/${p.costo_envio ?? '-'} <span class="text-[9px] text-gray-500">(lo paga el cliente)</span></p></div>
+              <div><p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">A cobrar (Yape)</p><p class="text-green-400 font-bold">S/${p.saldo_cobrar ?? '-'}</p></div>
+              <div class="col-span-2"><p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Servicios adicionales</p><p class="text-white">Sin servicios adicionales</p></div>
             </div>
           </div>
 
@@ -388,7 +396,11 @@
 
         const select = document.getElementById('no_producto');
         select.innerHTML = '<option value="">Seleccionar producto...</option>' +
-          allProducts.map(p => `<option value="${p.handle}" data-price="${p.precio_unitario}">${p.nombre_corto} - S/${p.precio_unitario}</option>`).join('');
+          allProducts.map(p => {
+            const colorTxt = (p.color && p.color !== 'Único') ? ` (${p.color})` : '';
+            const stockTxt = (p.stock != null) ? ` · stock ${p.stock}` : '';
+            return `<option value="${p.handle}" data-price="${p.precio_unitario}">${p.grupo || p.nombre_corto}${colorTxt} - S/${p.precio_unitario}${stockTxt}</option>`;
+          }).join('');
       } catch (e) { console.error(e); }
 
       // Cargar agencias de Shalom para el selector de destino
@@ -404,7 +416,7 @@
 
       // Limpiar formulario
       document.getElementById('newOrderForm').reset();
-      document.getElementById('no_anticipo').value = '0';
+      document.getElementById('no_anticipo').value = '10';
       document.getElementById('no_saldo').value = '';
       document.getElementById('no_agencia_id').value = '';
       document.getElementById('newOrderModal').classList.remove('hidden');
@@ -467,8 +479,8 @@
         cliente_dni: document.getElementById('no_dni').value,
         cliente_telefono: document.getElementById('no_telefono').value,
         producto_handle: document.getElementById('no_producto').value,
-        precio_total: parseFloat(document.getElementById('no_precio').value),
-        saldo_cobrar: parseFloat(document.getElementById('no_saldo').value),
+        anticipo: parseFloat(document.getElementById('no_anticipo').value) || 0,
+        origen: document.getElementById('no_origen').value,
         agencia_destino: document.getElementById('no_destino').value,
         agencia_id: document.getElementById('no_agencia_id').value
       };
